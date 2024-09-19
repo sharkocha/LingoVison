@@ -1,0 +1,1 @@
+DNVRS-Webs is a server type for webcam(network camera).

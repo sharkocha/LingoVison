@@ -1,0 +1,1 @@
+RTSP is a kind of service for transfering data between media devices.

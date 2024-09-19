@@ -1,0 +1,1 @@
+DVR-VIDEO is a kind of service for playing video or music on media devices.
