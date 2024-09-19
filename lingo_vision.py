@@ -12,12 +12,18 @@ index, docs = create_index.load_index()
 
 start_time = time.time()
 
+# prompt
 WithPrompt = True
+# RAG
 WithRAG = True
+# Servcie
 WithProtocol = True
 WithService = True
+# TLS
 WithTLS = True
+# Banner
 WithBanner = True
+# Title
 WithTitle = True
 
 Start = 0
