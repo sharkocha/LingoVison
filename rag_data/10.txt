@@ -1,1 +1,1 @@
- Sierra is a server type for wap device(wireless routers).
+Sierra is a server type for wap device(wireless routers).
