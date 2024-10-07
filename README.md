@@ -22,7 +22,7 @@ mxbai-embed-large-v1-f16.llamafile --server --port 8080 --nobrowser
 * Chatting Model Server:
 
 ```
-Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile --server --port 8080 --nobrowser
+Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile --server --port 8081 --nobrowser
 ```
 
 ### Create Index for RAG
