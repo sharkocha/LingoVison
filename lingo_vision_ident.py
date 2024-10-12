@@ -26,16 +26,19 @@ WithBanner = True
 # Title
 WithTitle = True
 
-Start = 0
+Start = 36
 End = 333
 RagNum = 3
 
-df = pd.read_excel("./dataset/device_dataset2.xlsx")
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+output_filename = f"result/ident_res_{current_time}.txt"
+
+df = pd.read_excel("./dataset/unknown_dataset.xlsx")
 # df = df.sample(frac=1, random_state=42).reset_index(drop=True) # randomization
 features = df[
     ["IP", "Port", "Protocol", "Service", "Subject.CN", "Subject.O", "Title", "Banner"]
-].iloc[Start:End]
-true_labels = df["label"].iloc[Start:End]
+]#.iloc[Start:]
+# true_labels = df["label"]#.iloc[Start:End]
 device_types = [
     "router",
     "nas",
@@ -72,7 +75,7 @@ def query_llamafile(prompt) -> str:
     return str(completion.choices[0].message.content)
 
 
-def build_prompt(device_info, device_types):
+def build_prompt(device_info, device_types) -> str:
     device_types_str = ", ".join([f'"{device}"' for device in device_types])
     subject_cn = "" if pd.isna(device_info["Subject.CN"]) else device_info["Subject.CN"]
     subject_o = "" if pd.isna(device_info["Subject.O"]) else device_info["Subject.O"]
@@ -141,63 +144,37 @@ def build_prompt(device_info, device_types):
     prompt += "-----------------------------------\n"
     prompt += feature_info
     prompt += "-----------------------------------\n\n"
-    prompt += "I hope you just give me the device type that you infered and do not say any other words. The device type you infered must be one of the types that I gave you.\n"
+    prompt += """
+I hope you give me the device type and relative info that you infered in following JSON format and do not say any other words(Some JSON fields can be NULL if you don't know):
+
+```
+{
+    "device type": "XXX",
+    "confidence score": XX,
+    "device productor": "XXX",
+    "device version": "XXX",
+    "affiliated organizations": "XXX,
+    "inference reason": "XXX"
+}
+```
+
+The device type you infered could be one of the types that I gave you or any other type if you think it's more correct and accurate. However, device type can be `unknown` if you cannot infer it at all.
+"""
 
     return prompt
 
 
-predicted_labels = []
+with open(output_filename, "w") as f:
+    for idx, row in features.iterrows():
+        prompt = build_prompt(row, device_types)
+        prediction = query_llamafile(prompt)
 
-tr_i = 0
-for idx, row in features.iterrows():
-    prompt = build_prompt(row, device_types)
-    prediction = query_llamafile(prompt)
+        print(f"NO.{idx}============================================")
+        # print(prompt)
+        print(f"probe result:\n{prediction}\n")
+        f.write(f"NO.{idx}============================================\n")
+        f.write(f"{prediction}\n")
 
-    print(f"NO.{idx}============================================")
-    # print(prompt)
-    print(f"true type: {true_labels.iloc[tr_i]}")
-    print(f"probe result: {prediction}")
-
-    tr_i += 1
-
-    for device_type in device_types:
-        if device_type in prediction.lower():
-            predicted_labels.append(device_type)
-            print(f"predict: {device_type}")
-            break
-    else:
-        predicted_labels.append("unknown")
-        print("predict: unknown")
-
-
-conf_matrix = confusion_matrix(true_labels, predicted_labels, labels=device_types)
-class_report = classification_report(
-    true_labels, predicted_labels, labels=device_types, zero_division=0
-)
-
-print("Confusion Matrix:\n", conf_matrix)
-print("Classification Report:\n", class_report)
-
-os.makedirs("result", exist_ok=True)
-
-current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-conf_matrix_filename = f"result/confusion_matrix_{current_time}.csv"
-conf_matrix_df = pd.DataFrame(conf_matrix, index=device_types, columns=device_types)
-conf_matrix_df.to_csv(conf_matrix_filename)
-print(f"confusion matrix was saved to: {conf_matrix_filename}")
-
-class_report_dict = classification_report(
-    true_labels,
-    predicted_labels,
-    labels=device_types,
-    output_dict=True,
-    zero_division=0,
-)
-class_report_filename = f"result/classification_report_{current_time}.json"
-with open(class_report_filename, "w") as f:
-    json.dump(class_report_dict, f, indent=4)
-print(f"classification report was saved to: {class_report_filename}")
 
 end_time = time.time()
 execution_time = end_time - start_time

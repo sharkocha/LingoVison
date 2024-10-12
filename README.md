@@ -33,7 +33,9 @@ Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile --server --port 8081 --nobrowser
 
 ### Test Performance
 
-Execute `lingo_vision.py` to test the performance of device type identification. This will use test dataset in `dataset` directory and generate results to `result` directory.
+Execute `lingo_vision_test.py` to test the performance of device type identification. This will use test dataset in `dataset` directory and generate results to `result` directory.
+
+Execute `lingo_vision_ident.py` to practically identify the devices in `dataset` directory.
 
 ### Generate Picture
 
