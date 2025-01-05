@@ -48,3 +48,19 @@ python conf_picture.py confusion_matrix.csv conf_output.png
 ```
 python class_picture.py classification_report.json class_output.png
 ```
+
+## Paper
+
+This method originated from a research point in my master's thesis. There are more detailed descriptions and experiments in the thesis:
+
+```
+@mastersthesis{chen2024,
+  author = {Chen Chiyu},
+  title = {Research on Technologies of Network Protocol and Device Identification Based on Application-Layer Scanning},
+  school = {National University of Defense Technology},
+  year = {2024},
+  month = {December}
+}
+```
+
+Thesis name in Chinese:《基于应用层探测的网络协议与设备识别技术研究》
